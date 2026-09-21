@@ -1,0 +1,6 @@
+{
+  "name": "CartG",
+  "description": "CartG Supermarket website with online item selection, interactive cart, express delivery checkout, WhatsApp ordering, aisles catalog, and admin inventory/order management CRM.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

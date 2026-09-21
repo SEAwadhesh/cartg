@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cb33b896-1c96-45b9-a900-b9fe5d73c68e",
+    "email": "test@gmail.com",
+    "name": "Test",
+    "role": "superadmin",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    "lastLogin": "Never logged in",
+    "createdAt": "Sep 21, 2026"
+  },
+  {
+    "id": "79f00d62-eb3a-47b5-b00b-036fe7c91974",
+    "email": "demo@gmail.com",
+    "name": "Demo",
+    "role": "editor",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    "lastLogin": "Never logged in",
+    "createdAt": "Sep 21, 2026"
+  },
+  {
+    "id": "a236c5f5-61e9-46bc-a559-ca5699063316",
+    "email": "admin@gmail.com",
+    "name": "ADMIN",
+    "role": "superadmin",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    "lastLogin": "Sep 22, 2026, 12:25 AM",
+    "createdAt": "Sep 18, 2026"
+  },
+  {
+    "id": "4e38bc3a-170a-4e22-b994-7b67ebf9d059",
+    "email": "abc@gmail.com",
+    "name": "ABC",
+    "role": "superadmin",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+    "lastLogin": "Sep 21, 2026, 07:50 PM",
+    "createdAt": "Sep 20, 2026"
+  }
+]
