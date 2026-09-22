@@ -319,6 +319,28 @@ app.post('/api/admin/authorize', async (req: Request, res: Response) => {
 app.get('/api/admin/list-users', requireAdminAuth, async (req: Request, res: Response) => {
   const currentUser = (req as any).adminUser;
   let admins = loadAdminRegistry();
+  const directoryById = new Map(admins.map((admin) => [admin.id, admin]));
+
+  const addDirectoryAdmin = (user: any) => {
+    const email = String(user.email || '').toLowerCase();
+    if (!email) return;
+
+    const account = registerOrUpdateAdmin({
+      id: user.id,
+      email,
+      name: user.user_metadata?.name || user.user_metadata?.full_name || email.split('@')[0] || 'Administrator',
+      role: (user.user_metadata?.role as any) || (user.app_metadata?.role as any) || 'superadmin',
+      status: user.user_metadata?.status || 'active',
+      avatarUrl: user.user_metadata?.avatar_url,
+      createdAt: user.created_at
+        ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+        : undefined,
+      lastLogin: user.last_sign_in_at
+        ? new Date(user.last_sign_in_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : undefined
+    });
+    directoryById.set(account.id, account);
+  };
 
   // 1. If supabaseAdmin is available, attempt to sync users from Supabase Auth
   if (supabaseAdmin) {
@@ -333,23 +355,8 @@ app.get('/api/admin/list-users', requireAdminAuth, async (req: Request, res: Res
         admins = admins.filter(a => activeIds.has(a.id) || activeEmails.has(a.email.toLowerCase()));
         saveAdminRegistry(admins);
 
-        for (const u of adminUsers) {
-          const uEmail = (u.email || '').toLowerCase();
-          registerOrUpdateAdmin({
-            id: u.id,
-            email: uEmail,
-            name: u.user_metadata?.name || u.user_metadata?.full_name || uEmail.split('@')[0] || 'Administrator',
-            role: (u.user_metadata?.role as any) || (u.app_metadata?.role as any) || 'superadmin',
-            status: u.user_metadata?.status || 'active',
-            createdAt: u.created_at
-              ? new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-              : undefined,
-            lastLogin: u.last_sign_in_at
-              ? new Date(u.last_sign_in_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-              : undefined
-          });
-        }
-        admins = loadAdminRegistry();
+        for (const user of adminUsers) addDirectoryAdmin(user);
+        admins = Array.from(directoryById.values());
       }
     } catch (adminApiErr: any) {
       // Non-fatal: continue with persistent registry
@@ -376,23 +383,14 @@ app.get('/api/admin/list-users', requireAdminAuth, async (req: Request, res: Res
           admins = admins.filter(a => rpcIds.has(a.id) || rpcEmails.has(a.email.toLowerCase()));
           saveAdminRegistry(admins);
 
-          for (const u of rpcUsers) {
-            const uEmail = (u.email || '').toLowerCase();
-            registerOrUpdateAdmin({
-              id: u.id,
-              email: uEmail,
-              name: u.raw_user_meta_data?.name || u.raw_user_meta_data?.full_name || uEmail.split('@')[0] || 'Administrator',
-              role: (u.raw_user_meta_data?.role as any) || (u.raw_app_meta_data?.role as any) || 'superadmin',
-              status: u.raw_user_meta_data?.status || 'active',
-              createdAt: u.created_at
-                ? new Date(u.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-                : undefined,
-              lastLogin: u.last_sign_in_at
-                ? new Date(u.last_sign_in_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-                : undefined
+          for (const user of rpcUsers) {
+            addDirectoryAdmin({
+              ...user,
+              user_metadata: user.raw_user_meta_data,
+              app_metadata: user.raw_app_meta_data
             });
           }
-          admins = loadAdminRegistry();
+          admins = Array.from(directoryById.values());
         }
       }
     } catch (_rpcErr) {
@@ -403,7 +401,7 @@ app.get('/api/admin/list-users', requireAdminAuth, async (req: Request, res: Res
   // 2. Ensure the currently authenticated admin has their latest session active
   if (currentUser) {
     const cEmail = (currentUser.email || '').toLowerCase();
-    registerOrUpdateAdmin({
+    const account = registerOrUpdateAdmin({
       id: currentUser.id,
       email: cEmail,
       name: currentUser.user_metadata?.name || currentUser.user_metadata?.full_name || cEmail.split('@')[0] || 'Administrator',
@@ -417,7 +415,8 @@ app.get('/api/admin/list-users', requireAdminAuth, async (req: Request, res: Res
         minute: '2-digit'
       })
     });
-    admins = loadAdminRegistry();
+    directoryById.set(account.id, account);
+    admins = Array.from(directoryById.values());
   }
 
   return res.json({ success: true, accounts: admins, users: admins });
