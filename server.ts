@@ -420,7 +420,7 @@ app.get('/api/admin/list-users', requireAdminAuth, async (req: Request, res: Res
     admins = loadAdminRegistry();
   }
 
-  return res.json({ success: true, accounts: admins });
+  return res.json({ success: true, accounts: admins, users: admins });
 });
 
 /**
