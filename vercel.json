@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/[...path].ts": {
+    "api/**/*.ts": {
       "includeFiles": "dist/server.cjs"
     }
   }
