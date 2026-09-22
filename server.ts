@@ -10,6 +10,8 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+export { app };
+
 app.use(express.json());
 
 // Enable CORS for development environments (e.g. localhost frontend on port 5173 talking to backend on port 3000)
@@ -755,4 +757,6 @@ async function start() {
   });
 }
 
-start();
+if (process.env.VERCEL !== '1') {
+  start();
+}
